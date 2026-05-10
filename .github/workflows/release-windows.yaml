@@ -12,10 +12,8 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Extract tag name
-        run: |
-          $tag = "${{ github.ref }}".Replace('refs/tags/', '')
-          echo "tag=$(echo $tag)" >> $env:GITHUB_ENV
+      - name: Install yq
+        run: choco install yq -y
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2.16.0
