@@ -1,0 +1,39 @@
+name: "Release Windows Only"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: "Build Windows"
+    runs-on: "windows-latest"
+    permissions: write-all
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Extract tag name
+        run: |
+          $tag = "${{ github.ref }}".Replace('refs/tags/', '')
+          echo "tag=$(echo $tag)" >> $env:GITHUB_ENV
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.16.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows
+
+      - name: Package ZIP
+        run: Compress-Archive build/windows/x64/runner/Release/* Kazumi_windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: Kazumi_windows.zip
